@@ -3,6 +3,7 @@ package com.pess.vet.service;
 
 import com.pess.vet.dto.OwnerRequest;
 import com.pess.vet.dto.OwnerResponse;
+import com.pess.vet.dto.OwnerUpdateRequest;
 import com.pess.vet.model.Owner;
 import com.pess.vet.repository.OwnerRepository;
 import org.springframework.stereotype.Service;
@@ -84,16 +85,22 @@ public class OwnerService {
 
     //Edit
 
-    public OwnerResponse editOwnerAttribute(UUID ownerId, OwnerRequest request){
+    public OwnerResponse editOwnerAttribute(UUID ownerId, OwnerUpdateRequest request){
 
         Owner ownerFound = ownerRepository.findById(ownerId)
                 .orElseThrow(() -> new OwnerNotExitsException("this owner does not exist"));
 
-        //Aqui eu aprendi um conceito muito importante que é o Builder
+        //Antes de atualizar, verifico se algum atributo foi passado como vazio;
+        validateIfAttributeUpdateNotEmpty(request.name(), "name");
+        validateIfAttributeUpdateNotEmpty(request.email(), "email");
+        validateIfAttributeUpdateNotEmpty(request.numberPhone(), "numberPhone");
+        validateIfAttributeUpdateNotEmpty(request.address(), "address");
+
+        //Aqui eu aprendi um conceito muito importante: Builder
         Owner ownerUpdated = Owner.builder() //Criei um builder que verifica se o argumento está vazio
                 .id(ownerFound.getId())
                 .name(request.name() != null ? request.name() : ownerFound.getName())
-                .cpf(request.cpf() != null ? request.cpf() : ownerFound.getCpf())
+                .cpf(ownerFound.getCpf()) //--> O CPF é um atributo que não pode ser editado, então não tem sentido colocar ele aqui.
                 .email(request.email() != null ? request.email() : ownerFound.getEmail())
                 .numberPhone(request.numberPhone() != null ? request.numberPhone() : ownerFound.getNumberPhone())
                 .address(request.address() != null ? request.address() : ownerFound.getAddress())
@@ -121,6 +128,13 @@ public class OwnerService {
 
     public void deleteOwner(UUID ownerId){
         ownerRepository.deleteById(ownerId);
+    }
+
+    // Other methods
+    private void validateIfAttributeUpdateNotEmpty(String value, String attributeName) {
+        if (value != null && value.isEmpty()) {
+            throw new InvalidOwnerAttributeException(attributeName + " cannot be empty");
+        }
     }
 
 }

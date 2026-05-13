@@ -2,6 +2,7 @@ package com.pess.vet.controller;
 
 import com.pess.vet.dto.OwnerRequest;
 import com.pess.vet.dto.OwnerResponse;
+import com.pess.vet.dto.OwnerUpdateRequest;
 import com.pess.vet.service.OwnerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class OwnerController {
 
     @PutMapping("/{ownerId}/edit")
     public ResponseEntity<OwnerResponse> editOwnerAttribute(@PathVariable UUID ownerId,
-                                                            @RequestBody OwnerRequest request){
+                                                            @RequestBody @Valid OwnerUpdateRequest request){
         OwnerResponse ownerUpdated = ownerService.editOwnerAttribute(ownerId, request);
         return ResponseEntity.ok(ownerUpdated);
 

@@ -40,4 +40,13 @@ public class GlobalExceptionHandler {
                 Instant.now()
         ));
     }
+
+    @ExceptionHandler(InvalidOwnerAttributeException.class)
+    public ResponseEntity<ErrorResponse> invalidOwnerAttributeExceptionHandler(InvalidOwnerAttributeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                Instant.now()
+        ));
+    }
 }
